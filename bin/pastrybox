@@ -1,0 +1,152 @@
+#!/usr/bin/env node
+
+/**
+ * A simple program to read the Pastry Box in the console
+ * and print pdfs of the project
+ *
+ * MIT License
+ *
+ * @alexduloz
+ */
+var prompt = require("prompt");
+var request = require("request");
+var path = require("path");
+var childProcess = require('child_process');
+var phantom = __dirname + "/lib/phantomjs";
+
+var endpoints = {
+    "consume": {
+        "thoughts": "http://lab.the-pastry-box-project.net/api/v1/consume/thoughts"
+    }
+};
+
+function program() {
+
+    var cwd = process.argv[1];
+
+    // args
+    var today;
+    var day;
+    var from;
+    var to;
+    var baker;
+    var print;
+    var file;
+
+    if (process.argv.length > 2) {
+
+        for (var i = 0; i < process.argv.length; i++) {
+
+            if (process.argv[i] === "today") {
+                today = i;
+            }
+
+            if (process.argv[i] === "day") {
+                day = i;
+            }
+
+            if (process.argv[i] === "from") {
+                from = i;
+            }
+
+            if (process.argv[i] === "to") {
+                to = i;
+            }
+
+            if (process.argv[i] === "baker") {
+                baker = i;
+            }
+
+            if (process.argv[i] === "print") {
+                print = i;
+            }
+
+            if (process.argv[i] === "file") {
+                file = i;
+            }
+        };
+
+        // build qs
+        var qs = "";
+
+        if (today) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1;
+            var yyyy = today.getFullYear();
+
+            today = dd + '-' + mm + '-' + yyyy;
+            qs += "&day=" + today;
+        }
+
+        if (from) {
+            qs += "&from=" + process.argv[from + 1];
+        }
+
+        if (to) {
+            qs += "&to=" + process.argv[to + 1];
+        }
+
+        if (day) {
+            qs += "&day=" + process.argv[day + 1];
+        }
+
+        if (baker) {
+            qs += "&baker=" + process.argv[baker + 1];
+        }
+
+        if (print) {
+            qs += "&format=html";
+        } else {
+            qs += "&format=markdown";
+        }
+
+        qs = "?" + qs.substr(1);
+
+        if (file) {
+            file = process.argv[file + 1];
+        }
+    }
+
+    if (!print) {
+        request.get(endpoints.consume.thoughts + qs, function(error, response) {
+
+            if (error) {
+                console.log("Connection to the Pastry Box server failed");
+                return;
+            }
+
+            console.log(response.body);
+
+            return;
+        });
+    }
+
+    if (print) {
+        console.log("Creating your document (this may take a while depending on the size of what you're printing)");
+
+        file = (file) ? file : "pastrybox-" + new Date().getTime();
+
+        if (file.slice(-4).toLowerCase() !== ".pdf") {
+            file += ".pdf";
+        }
+
+        var args = [
+            path.join(__dirname + "/lib/", 'print.js'),
+            endpoints.consume.thoughts + qs,
+            file
+        ]
+
+        childProcess.execFile(phantom, args, function(err, stdout, stderr) {
+            if (err) {
+                console.log("Sorry, an error occured: " + stderr);
+                return;
+            }
+            console.log("Your document is ready");
+        });
+
+    }
+
+}
+
+program();

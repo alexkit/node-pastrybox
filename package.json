@@ -1,0 +1,21 @@
+{
+  "name": "node-pastrybox",
+  "version": "0.0.1",
+  "author": "@alexduloz <alex@one-two-one-two-microphone-check.com>",
+  "description": "Read in the console and print the texts published on The Pastry Box Project",
+  "contributors": [
+    {
+      "name": "Alex Duloz",
+      "email": "alex@one-two-one-two-microphone-check.com"
+    }
+  ],
+  "dependencies": {
+    "request": "2.20.x",
+    "prompt": "0.2.x"
+  },
+  "license": "MIT",
+  "bin": {
+    "pastrybox": "bin/pastrybox"
+  },
+  "preferGlobal": true
+}
