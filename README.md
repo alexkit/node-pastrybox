@@ -46,7 +46,17 @@ Any response can be turned into a PDF file. Just add the `print` argument to you
 	$ pastrybox today print
 	$ pastrybox day 21-10-2012 print
 	$ pastrybox from 21-10-2012 to 21-11-2012 print
+	$ pastrybox baker erin-kissane print
 	...
+
+`To print all the content published on the The Pastry Box, just do:`
+
+`$ pastrybox print`
+
+To extract our database in a JSON format, just do:
+
+`$ pastrybox`
+
 
 *PDF files are always created in the current working directory.*
 

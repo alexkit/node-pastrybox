@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * A simple program to read the Pastry Box in the console
- * and print pdfs of the project
+ * A simple program to read the Pastry Box in the console,
+ * print pdfs of the project and clone our archives.
  *
  * MIT License
  *
@@ -11,18 +11,20 @@
 var prompt = require("prompt");
 var request = require("request");
 var path = require("path");
+var fs = require("fs-extra");
 var childProcess = require('child_process');
 var phantom = __dirname + "/lib/phantomjs";
 
 var endpoints = {
     "consume": {
-        "thoughts": "http://lab.the-pastry-box-project.net/api/v1/consume/thoughts"
+        "thoughts": "http://lab.the-pastry-box-project.net/api/v1/consume/thoughts",
+        "archives": "http://lab.the-pastry-box-project.net/api/v1/consume/archives",
     }
 };
 
-function program() {
+var cwd = path.dirname(process.argv[1]);
 
-    var cwd = process.argv[1];
+function program() {
 
     // args
     var today;
@@ -32,9 +34,21 @@ function program() {
     var baker;
     var print;
     var file;
+    var qs;
 
     if (process.argv.length > 2) {
 
+        //
+        // Clone
+        //
+        if (process.argv[2] === "clone") {
+            clone();
+            return;
+        }
+
+        //
+        // Read/print
+        //
         for (var i = 0; i < process.argv.length; i++) {
 
             if (process.argv[i] === "today") {
@@ -67,7 +81,7 @@ function program() {
         };
 
         // build qs
-        var qs = "";
+        qs = "";
 
         if (today) {
             var today = new Date();
@@ -101,18 +115,23 @@ function program() {
             qs += "&format=markdown";
         }
 
-        qs = "?" + qs.substr(1);
-
         if (file) {
             file = process.argv[file + 1];
         }
     }
+
+    qs = (typeof qs !== "undefined") ? "?" + qs.substr(1) : "";
 
     if (!print) {
         request.get(endpoints.consume.thoughts + qs, function(error, response) {
 
             if (error) {
                 console.log("Connection to the Pastry Box server failed");
+                return;
+            }
+
+            if (response.statusCode === 500) {
+                console.log("The Pastry Box server returned a '500' HTTP code. Sorry about that...");
                 return;
             }
 
@@ -144,6 +163,68 @@ function program() {
             }
             console.log("Your document is ready");
         });
+
+    }
+
+}
+
+function clone() {
+    var clonable = [
+        "archives"
+    ];
+
+    var toClone = process.argv[3];
+
+    if (clonable.indexOf(toClone) === -1) {
+        console.log("Wrong paramater. Try '$ pastrybox clone archives'");
+        return;
+    }
+
+    console.log("Cloning...");
+
+    var year = process.argv[4];
+    var yearOrNot = (typeof year !== "undefined") ? "?year=" + year : "";
+
+    request.get(endpoints.consume.archives + yearOrNot, function(error, response) {
+
+        if (error) {
+            console.log("Connection to the Pastry Box server failed");
+            return;
+        }
+
+        if (response.statusCode === 500) {
+            console.log("The Pastry Box server returned a '500' HTTP code. Sorry about that...");
+            return;
+        }
+
+        if (response.statusCode !== 200) {
+            console.log(response.body);
+            return;
+        }
+
+        try {
+            var archives = JSON.parse(response.body);
+        } catch (e) {
+            console.log("The response is not valid JSON. This is weird... Could you let @alexduloz know?");
+            console.log(e);
+            return;
+        }
+        var l = archives.length;
+        for (var i = 0; i < l; i++) {
+            var dir = archives[i].dir;
+            for (var k = 0; k < archives[i].paths.length; k++) {
+                for (var ext in archives[i].files) {
+                    fs.outputFileSync(cwd + dir + archives[i].paths[k] + ext, archives[i].files[ext]);
+                }
+            };
+        };
+
+        console.log("Done!");
+
+        return;
+    });
+
+    function writeChunk() {
 
     }
 
