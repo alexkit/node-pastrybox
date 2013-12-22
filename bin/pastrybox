@@ -17,8 +17,8 @@ var phantom = __dirname + "/lib/phantomjs";
 
 var endpoints = {
     "consume": {
-        "thoughts": "http://lab.the-pastry-box-project.net/api/v1/consume/thoughts",
-        "archives": "http://lab.the-pastry-box-project.net/api/v1/consume/archives",
+        "thoughts": "https://the-pastry-box-project.net/api/v1/consume/thoughts",
+        "archives": "https://the-pastry-box-project.net/api/v1/consume/archives",
     }
 };
 

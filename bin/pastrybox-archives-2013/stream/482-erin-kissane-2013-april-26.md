@@ -1,4 +1,0 @@
-
-
-# Quaker Mode, Mike Monteiro
-

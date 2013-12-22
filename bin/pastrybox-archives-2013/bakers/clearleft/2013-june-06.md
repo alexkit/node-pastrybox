@@ -1,4 +1,0 @@
-
-
-# —Paul Robert Lloyd
-
