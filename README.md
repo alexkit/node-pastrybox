@@ -1,4 +1,4 @@
-[![devDependency Status](https://david-dm.org/the-pastry-box-project/node-pastrybox/dev-status.png)](https://david-dm.org/the-pastry-box-project/node-pastrybox#info=devDependencies)
+[![devDependency Status](https://david-dm.org/alexduloz/node-pastrybox/dev-status.png)](https://david-dm.org/alexduloz/node-pastrybox#info=devDependencies)
 
 This package lets you read directly in the console *and* print the texts published on [The Pastry Box Project](http://the-pastry-box-project.net).
 

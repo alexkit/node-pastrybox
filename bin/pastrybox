@@ -22,7 +22,7 @@ var endpoints = {
     }
 };
 
-var cwd = path.dirname(process.argv[1]);
+var cwd = process.cwd();
 
 function program() {
 
